@@ -1,4 +1,4 @@
-# fagaru-vue
+# Dossier-patient
 
 ## Project setup
 ```
