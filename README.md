@@ -1,4 +1,4 @@
-# Dossier-patient
+# Dossier patient
 
 ## Project setup
 ```

@@ -93,7 +93,6 @@ export default {
       .then(snap => {
         snap.forEach(doc => {
           let patient = {id: doc.id};
-          console.log("Hello");
           Object.assign(patient, doc.data()); 
           this.patients.push(patient);
         });

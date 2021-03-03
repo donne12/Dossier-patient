@@ -1,72 +1,59 @@
-// Login.vue
-
 <template>
-  <div>
-		<h1>Se connecter</h1>
-		<form v-if="(phoneIsValid == false)" @submit.prevent="signInWithPhone">
-			<div class="form-group">
-				<label>Numéro de téléphone</label>
-				<input type="text" name="tel" class="form-control" placeholder="taper votre numéro ici" required v-model="user.tel"/>
-			</div>
-			<div class="form-group">
-				<div id="recaptcha-container"></div>
-			</div>
-			<div class="form-group">
-				<input type="submit" class="btn btn-primary" value="Valider"/>
-			</div>
-		</form>
-		<form v-if="phoneIsValid" @submit.prevent="confirmCode">
-			<div class="form-group">
-				<label>Code de vérification</label>
-				<input type="number" name="tel" class="form-control" placeholder="taper le code ici" required v-model="user.code"/>
-			</div>
-			<div class="form-group">
-				<input type="submit" class="btn btn-primary" value="Valider"/>
-			</div>
-		</form>
-  </div>
+	<div class="column">
+		<h2>Se connecter</h2>
+		<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 col-md-offset-3">
+			<label>E-mail</label>
+			<input type="email" v-model="formData.email" class="form-control" placeholder="email">
+			<br>
+			<label>Mot de passe</label>
+			<input type="password" v-model="formData.password" class="form-control" placeholder="mot de passe">
+			<br>
+			<button class="btn btn-primary" @click="signIn">Valider</button>
+		</div>
+	</div>
 </template>
 
 <script>
-import Firebase from 'firebase'
-
-export default {
-	name: 'Login',
-	data() {
-		return {
-			phoneIsValid: false,
-			user: {}
-		}
-	},
-	methods: {
-		signInWithPhone() {
-			Firebase.auth().languageCode = 'fr';
-			window.recaptchaVerifier = new Firebase.auth.RecaptchaVerifier('recaptcha-container');
-		//	this.user.tel = '+228'+this.user.tel;
-			Firebase.auth().signInWithPhoneNumber(this.user.tel, window.recaptchaVerifier)
-				.then(confirmationResult => {
-					// SMS sent. Prompt user to type the code from the message, then sign the
-					// user in with confirmationResult.confirm(code).
-					window.confirmationResult = confirmationResult;
-					this.phoneIsValid = true;
-				}).catch(() => {
-					// Error; SMS not sent
-					window.grecaptcha.reset(window.recaptchaWidgetId);
-					this.phoneIsValid = false;
-				});
+	import Firebase from 'firebase';
+	export default {
+		name: 'SignIn',
+		data () {
+			return {
+				formData:{
+					email:'',
+					password:''
+				}
+			}
 		},
-		confirmCode() {
-			window.confirmationResult.confirm(this.user.code).then(() => {
-				// User signed in successfully.
-				// var user = result.user;
-				this.$router.replace('/accueil');
-			})
-			// .catch(function (error) {
-			// 	// User couldn't sign in (bad verification code?)
-			// 	// eslint-disable-next-line no-console
-			// 	// console.log('cannot sign in');
-			// });
+		methods: {
+			signIn(){
+				Firebase.auth().signInWithEmailAndPassword(this.formData.email,this.formData.password)
+						.then((user)=>{
+							this.$router.replace('/accueil')
+						})
+						.catch((e)=>{
+							alert(e.message)
+						})
+			}
+		},
+		created(){
 		}
 	}
-}
 </script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+	h1, h2 {
+		font-weight: normal;
+	}
+	ul {
+		list-style-type: none;
+		padding: 0;
+	}
+	li {
+		margin: 0 10px;
+	}
+	a {
+		color: #42b983;
+	}
+</style>
