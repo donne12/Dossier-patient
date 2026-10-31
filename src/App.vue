@@ -1,6 +1,3 @@
-<style lang="css">
-  @import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
-</style>
 
 <template>
   <div id="app">
@@ -61,14 +58,14 @@ input[type=text]::placeholder {
 
 
 <script>
-import Firebase from 'firebase'
+import Firebase from './config/db'
 
 export default {
 	name: 'App',
 	methods: {
 		logout() {
 			Firebase.auth().signOut().then(() => {
-        this.$router.replace('login');
+        this.$router.replace('/login');
       })
       // .catch(function(error) {
       //   // An error happened.

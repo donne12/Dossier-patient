@@ -24,8 +24,8 @@
 
 <script>
 import { db } from '../config/db';
-import AjouterNote from './AjouterNote';
-import Notes from './Notes';
+import AjouterNote from './AjouterNote.vue';
+import Notes from './Notes.vue';
 
 export default {
   name: 'FichePatient',

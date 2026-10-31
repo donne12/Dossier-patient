@@ -1,7 +1,9 @@
-// db.js
-import Firebase from 'firebase'
+// db.js: Firebase v12 compat layer keeps the namespaced API used by the whole app
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/firestore';
 
-let config = {
+const config = {
 	apiKey: "AIzaSyBvW0gYrCEfIOkVAF5KV4B6QB2VGozChYo",
 	authDomain: "dossier-patient-b7cb9.firebaseapp.com",
 	projectId: "dossier-patient-b7cb9",
@@ -10,7 +12,6 @@ let config = {
 	appId: "1:966993653001:web:fddd2d20fd3b7f1cb4f7d8"
 };
 
-let app = Firebase.initializeApp(config);
+const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(config);
 export const db = app.firestore();
-const settings = { timestampsInSnapshots: true };
-db.settings(settings);
+export default firebase;

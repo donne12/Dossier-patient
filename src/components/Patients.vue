@@ -66,6 +66,9 @@
 </template>
 
 <script>
+import { markRaw } from 'vue';
+// Firestore queries and snapshots must stay out of Vue's deep reactivity (and may be undefined for empty results)
+const raw = (x) => (x ? markRaw(x) : x);
 import { db } from '../config/db';
 export default {
   name: 'Patients',
@@ -79,7 +82,7 @@ export default {
       currentPageFirstDoc: {},
       patients: [],
       search: {},
-      patientsRef: db.collection('patients'),
+      patientsRef: raw(db.collection('patients')),
       hasPrevLink: false,
       hasNextLink: false
     }
@@ -96,22 +99,22 @@ export default {
           Object.assign(patient, doc.data()); 
           this.patients.push(patient);
         });
-        this.currentPageFirstDoc = snap.docs[0];
-        this.currentPageLastDoc = snap.docs[snap.docs.length - 1];
+        this.currentPageFirstDoc = raw(snap.docs[0]);
+        this.currentPageLastDoc = raw(snap.docs[snap.docs.length - 1]);
         this.hasPrev();
         this.hasNext();
       });
   },
   methods: {
     rechercher() {
-      this.patientsRef = db.collection('patients')
+      this.patientsRef = raw(db.collection('patients'))
 
       if (this.search.nom_de_famille)
-        this.patientsRef = this.patientsRef.where('nom_de_famille', '==', this.search.nom_de_famille.toUpperCase())
+        this.patientsRef = raw(this.patientsRef.where('nom_de_famille', '==', this.search.nom_de_famille.toUpperCase()))
       if (this.search.prenom)
-        this.patientsRef = this.patientsRef.where('prenom', '==', this.search.prenom)
+        this.patientsRef = raw(this.patientsRef.where('prenom', '==', this.search.prenom))
       if (this.search.cni)
-        this.patientsRef = this.patientsRef.where('cni', '==', this.search.cni)
+        this.patientsRef = raw(this.patientsRef.where('cni', '==', this.search.cni))
       
       this.patientsRef
         .orderBy(this.orderBy[0], this.direction)
@@ -125,8 +128,8 @@ export default {
             Object.assign(patient, doc.data()); 
             this.patients.push(patient);
           });
-          this.currentPageFirstDoc = snap.docs[0];
-          this.currentPageLastDoc = snap.docs[snap.docs.length - 1];
+          this.currentPageFirstDoc = raw(snap.docs[0]);
+          this.currentPageLastDoc = raw(snap.docs[snap.docs.length - 1]);
           this.hasPrev();
           this.hasNext();
         });
@@ -140,8 +143,8 @@ export default {
         .get()
         .then(snap => {
           if(snap.docs.length){
-            this.currentPageFirstDoc = snap.docs[0];
-            this.currentPageLastDoc = snap.docs[snap.docs.length - 1];
+            this.currentPageFirstDoc = raw(snap.docs[0]);
+            this.currentPageLastDoc = raw(snap.docs[snap.docs.length - 1]);
             this.patients = [];
             snap.forEach(doc => {
               let patient = {id: doc.id};
@@ -163,8 +166,8 @@ export default {
         .get()
         .then(snap => {
           if(snap.docs.length){
-            this.currentPageFirstDoc = snap.docs[snap.docs.length - 1];
-            this.currentPageLastDoc = snap.docs[0];
+            this.currentPageFirstDoc = raw(snap.docs[snap.docs.length - 1]);
+            this.currentPageLastDoc = raw(snap.docs[0]);
             this.patients = [];
             snap.forEach(doc => {
               let patient = {id: doc.id};

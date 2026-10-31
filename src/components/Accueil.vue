@@ -3,7 +3,7 @@
 <template>
   <div>
     <h1>Accueil</h1>
-    <img src="telecharger.ico">
+    <img src="/telecharger.ico">
     <p>Bienvenue sur le gestionnaire de <strong>dossiers patients</strong>.
       Dans cette application, vous avez accès aux données de tous les patients de votre hôpital.
     </p>

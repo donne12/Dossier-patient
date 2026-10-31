@@ -12,7 +12,7 @@
       <tbody v-if="notes.length">
           <tr v-for="note in notes" v-bind:key="note.id">
             <td>{{ note.note }}</td>
-            <td nowrap>{{ note.created_at | date('DD-MM-YYYY hh:mm:ss') }}</td>
+            <td nowrap>{{ $date(note.created_at, 'DD-MM-YYYY hh:mm:ss') }}</td>
           </tr>
       </tbody>
       <tbody v-else>
@@ -35,6 +35,9 @@
 
 <script>
 
+import { markRaw } from 'vue';
+// Firestore queries and snapshots must stay out of Vue's deep reactivity (and may be undefined for empty results)
+const raw = (x) => (x ? markRaw(x) : x);
 import { db } from '../config/db';
 
 export default {
@@ -67,8 +70,8 @@ export default {
           Object.assign(note, doc.data()); 
           this.notes.push(note);
         });
-        this.currentPageFirstDoc = snap.docs[0];
-        this.currentPageLastDoc = snap.docs[snap.docs.length - 1];
+        this.currentPageFirstDoc = raw(snap.docs[0]);
+        this.currentPageLastDoc = raw(snap.docs[snap.docs.length - 1]);
         this.hasPrev();
         this.hasNext();
       }
@@ -86,8 +89,8 @@ export default {
         .get()
         .then(snap => {
           if(snap.docs.length){
-            this.currentPageFirstDoc = snap.docs[0];
-            this.currentPageLastDoc = snap.docs[snap.docs.length - 1];
+            this.currentPageFirstDoc = raw(snap.docs[0]);
+            this.currentPageLastDoc = raw(snap.docs[snap.docs.length - 1]);
             this.notes = [];
             snap.forEach(doc => {
               let note = {id: doc.id};
@@ -110,8 +113,8 @@ export default {
         .get()
         .then(snap => {
           if(snap.docs.length){
-            this.currentPageFirstDoc = snap.docs[snap.docs.length - 1];
-            this.currentPageLastDoc = snap.docs[0];
+            this.currentPageFirstDoc = raw(snap.docs[snap.docs.length - 1]);
+            this.currentPageLastDoc = raw(snap.docs[0]);
             this.notes = [];
             snap.forEach(doc => {
               let note = {id: doc.id};

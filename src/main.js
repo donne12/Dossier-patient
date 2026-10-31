@@ -1,11 +1,11 @@
 // main.js
 
-import Vue from 'vue'
-import VueFire from 'vuefire'
-import VueRouter from 'vue-router'
+import { createApp } from 'vue'
+import { createRouter, createWebHistory } from 'vue-router'
+import 'bootstrap/dist/css/bootstrap.min.css'
 import Moment from 'moment'
 import App from './App.vue'
-import Firebase from 'firebase'
+import Firebase from './config/db'
 
 import AjouterPatient from './components/AjouterPatient.vue'
 import ModifierPatient from './components/ModifierPatient.vue'
@@ -14,19 +14,14 @@ import Patients from './components/Patients.vue'
 import Accueil from './components/Accueil.vue'
 import Login from './components/Login.vue'
 
-Vue.use(VueFire)
-Vue.use(VueRouter)
-Vue.use(Moment)
-Vue.config.productionTip = false
-
 const routes = [
   {
-    path: '*',
-    redirect: 'Login',
+    path: '/:pathMatch(.*)*',
+    redirect: { name: 'Login' },
   },
   {
     path: '/',
-    redirect: 'Login',
+    redirect: { name: 'Login' },
   },
   {
       name: 'Login',
@@ -75,29 +70,23 @@ const routes = [
   },
 ];
 
-const router = new VueRouter({ mode: 'history', routes: routes });
+const router = createRouter({ history: createWebHistory(), routes })
 
-router.beforeEach ((to, from, next) => {
-  let currentUser = Firebase.auth().currentUser;
-  let requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-  
-  if(requiresAuth && !currentUser) next('login')
-  else if(!requiresAuth && currentUser) next('accueil')
-  else next()
+router.beforeEach((to) => {
+  const currentUser = Firebase.auth().currentUser
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+
+  if (requiresAuth && !currentUser) return { name: 'Login' }
+  if (!requiresAuth && currentUser) return { name: 'Accueil' }
+  return true
 })
 
-Vue.filter('date', function(value, format) {
-  if (value) {
-    return Moment(String(value.toDate())).format(format)
-  }
-})
-
-let app;
+let app
 Firebase.auth().onAuthStateChanged(function() {
-  if(!app) {
-    app = new Vue({
-      render: h => h(App),
-      router
-    }).$mount('#app')
+  if (!app) {
+    app = createApp(App).use(router)
+    // replaces the Vue 2 `date` filter
+    app.config.globalProperties.$date = (value, format) => (value ? Moment(String(value.toDate())).format(format) : undefined)
+    app.mount('#app')
   }
 });
